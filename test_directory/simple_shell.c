@@ -7,7 +7,6 @@ int main(void)
 	size_t n = 0;
 	int i, read_arg;
 
-	read_arg = 0;
 	while (1)
 	{
 		read_arg = write(STDOUT_FILENO, prompt, 16);
