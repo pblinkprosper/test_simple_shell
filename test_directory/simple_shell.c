@@ -1,50 +1,36 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "shell.h"
 
 int main(void)
 {
 	char *cmd_arg = NULL, *prompt = "my@simpleshell> ";
-	char *cmd_argcpy = NULL;
-	char *token = NULL;
-	char *delimiter = " \n";
+	char **argv = NULL, **token = NULL;
 	size_t n = 0;
-	char **argv = NULL;
-	int argc = 0, i = 0, read_arg;
+	int i, read_arg;
 
-	read_arg = write(STDOUT_FILENO, prompt, 16);
-	if (getline(&cmd_arg, &n, stdin) == -1)
-		return (-1);
-	cmd_argcpy = strdup(cmd_arg);
-
-	token = strtok(cmd_arg, delimiter);
-	
-	while (token)
+	read_arg = 0;
+	while (1)
 	{
-		token = strtok(NULL, delimiter);
-		argc++;
-	}
-
-	printf("%d\n", argc);
+		read_arg = write(STDOUT_FILENO, prompt, 16);
+		if (getline(&cmd_arg, &n, stdin) == -1)
+		{
+			free(cmd_arg);
+			exit(0);
+		}
+		newline_handle(cmd_arg);
+		argv = make_token(cmd_arg, ";");
 	
-	argv = malloc(sizeof(char *) * argc);
-
-	token = strtok(cmd_argcpy, delimiter);
-	while (token)
-	{
-		argv[i] = token;
-		token = strtok(NULL, delimiter);
-		i++;
+		for (i = 0; argv[i]; i++)
+		{
+			token = make_token(argv[i], " ");
+			if (token[0] == NULL)
+			{
+				free(token);
+				break;
+			}
+			free(token);
+		}
+		free(argv);
 	}
-	argv[i] = NULL;
-
-	i = 0;
-	while (argv[i])
-		printf("%s\n", argv[i++]);
-
 	free(cmd_arg);
-	free(cmd_argcpy);
-	free(argv);
 	return (0);
 }
