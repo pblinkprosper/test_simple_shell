@@ -2,7 +2,7 @@
 
 /**
  * _putchar - this function writes a character to  the stdout
- * @c: the character to be written
+ * @ch: the character to be written
  *
  * Return: returns 1 on success and -1 on error
  */
@@ -83,15 +83,11 @@ char *_strstr(char *haystack, char *needle)
  */
 char *_strchr(char *s, char *c)
 {
-	for (; ; s++)
+	for (; *s; s++)
 	{
-		if (*s == c)
+		if (*s == *c)
 		{
-			return (s);
-		}
-		if (*s == 0)
-		{
-			return (NULL);
+			return ((char *)(s));
 		}
 	}
 	return (NULL);
