@@ -7,36 +7,20 @@
  */
 int main(void)
 {
-	char *cmd_arg = NULL, *prompt = "$ ";
-	char **argv = NULL, **token = NULL;
-	size_t n = 0;
-	int argc = 0, i;
+	char *prompt = "$ ", *buff = NULL;
+	char **argv;
+	int argc = 0, i = 1;
 
-	while (1)
+	while (i)
 	{
-		write(STDOUT_FILENO, prompt, 2);
-		if (getline(&cmd_arg, &n, stdin) == -1)
-		{
-			free(cmd_arg);
-			exit(0);
-		}
-		newline_handle(cmd_arg);
-		argv = make_token(cmd_arg, ";");
-
-		for (i = 0; argv[i]; i++)
-		{
-			token = make_token(argv[i], " ");
-			if (token[0] == NULL)
-			{
-				free(token);
-				break;
-			}
-			argc = parse_cmd(token[0]);
-			init_shell(token, argc);
-			free(token);
-		}
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, prompt, 2);
+		buff = read_line();
+		argv = parse_cmd(buff);
+		i = get_f(argv, environ);
 		free(argv);
+		free(buff);
+		argc++;
 	}
-	free(cmd_arg);
 	return (0);
 }

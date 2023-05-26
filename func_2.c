@@ -1,68 +1,157 @@
 #include "shell.h"
 
 /**
- * _getenv - this function gets the environment
+ * _env - this function prints the environment
  * @name: the name of the path
+ *
+ * Return: an integer
+ */
+int _env(char **name)
+{
+	int e = 0;
+	int len = 0;
+	char *dup = malloc(2048);
+
+	while (name[e])
+	{
+		len = _strlen(name[e]);
+		*dup = _strlen(name[e]);
+		write(STDOUT_FILENO, dup, len + 1);
+		write(1, "\n", 1);
+		free(dup);
+		e++;
+	}
+	return (1);
+}
+
+/**
+ * _getenv - this function gets the environment
+ * @env: the name of the environment
+ * @str: the string containing the command
  *
  * Return: the pointer the path variable
  */
-char *_getenv(char *name)
+char *_getenv(char **env, char *str)
 {
-	char **ptr;
-	size_t len;
+	char *ptr = NULL, *temp = malloc(sizeof(char *) * BUFFER);
+	char *path = malloc(sizeof(char *) * BUFFER);
+	int len = 0, m = 0, n = 0;
+	int i = 0;
 
-	len = _strlen(name);
-	for (ptr = environ; *ptr != NULL; ptr++)
+	while (*env != NULL)
 	{
-		if (_strncmp(*ptr, name, len) == 0 && (*ptr)[len] == '=')
-			return (*ptr + len + 1);
+		path = _strdup(env[i]);
+		ptr = strtok(path, "=");
+		if (ptr != NULL && (_strcmp(ptr, str)) == 0)
+		{
+			path = _strdup(env[i]);
+			while (ptr[++m])
+				;
+			n = m + 1;
+			len = _strlen(path) - n;
+			i = 0;
+			while (i < len)
+			{
+				temp[i] = path[n];
+				i++;
+				n++;
+			}
+			free(path);
+			return (temp);
+		}
+		free(path);
+		i++;
 	}
+	free(temp);
+	free(path);
 	return (NULL);
 }
 
 /**
  * handle_path - this function gets the path for the command
  * @cmd: the command to search its path
+ * @env: the environment variable
  *
- * Return: the pointer to the path
+ * Return: an integer
  */
-char *handle_path(char *cmd)
+int handle_path(char **cmd, char **env)
 {
-	char *direc;
-	char *path = _getenv("PATH");
-	char *pathway = malloc(_strlen(path) + _strlen(cmd) + 2);
+	pid_t pid, cpid;
+	char *delim = "/", *temp = NULL;
+	int i = 0, j = 0;
 
-	if (!pathway)
-		return (NULL);
-	 direc = strtok(path, ":");
-	while (direc)
-	{
-		_strcpy(pathway, direc);
-		_strcat(pathway, "/");
-		_strcat(pathway, cmd);
-		if (access(pathway, F_OK) == 0)
-			return (pathway);
-		direc = strtok(NULL, ":");
+	temp = _strdup(cmd[0]);
+	if ((access(cmd[0], R_OK | X_OK)) == 0)
+	{	pid = fork();
+		if (pid == 0)
+		{
+			i = execve(cmd[0], cmd, env);
+			if (i == -1)
+			{
+				perror("hsh");
+			}
+			exit(EXIT_SUCCESS);
+		} else if (pid < 0)
+			perror("hsh");
+		else
+			do {
+				cpid = waitpid(pid, &i, WUNTRACED);
+				if (cpid == -1)
+					perror("hsh");
+			} while (!WIFSIGNALED(i) && !WIFEXITED(i));
+		free(temp);
+		return (1);
 	}
-	free(pathway);
-	return (NULL);
+	else if (temp)
+	{
+		for (j = 0; temp[j]; j++)
+			if (temp[j] == delim[0])
+			{
+				errno = ENOENT;
+				perror("hsh");
+				free(temp);
+				return (1);
+			}
+	}
+	free(temp);
+	return (0);
 }
 
 /**
- * exec_cmd - this function executes a command fed to it
- * @args: these are the arguments or commands
- * @arty: this is the argument type
+ * get_f - this function selects the function used to execute a command
+ * @cmd: this is the command
+ * @env: this gets the environment
  *
- * Return: this function returns nothing
+ * Return: integer
  */
-void exec_cmd(char **args, int arty)
+int get_f(char **cmd, char **env)
 {
-	if (arty == EXTR_CMD)
+	int g = 0;
+	char *builtin[4] = {"env", "cd", "exit", NULL};
+
+	if (!cmd[0])
+		return (1);
+	for (; builtin[g] != NULL; g++)
 	{
-		if (execve(args[0], args, NULL) == -1)
-		{
-			perror(_getenv("PWD"));
-			exit(2);
-		}
+		if (_strcmp(builtin[g], cmd[0]) == 0)
+			break;
 	}
+	switch (g)
+	{
+	case 0:
+		if (cmd[1] == NULL)
+			exit_sh(cmd);
+		else
+			exit_message(cmd);
+		break;
+	case 1:
+		_cd(cmd);
+		break;
+	case 2:
+		_env(env);
+		break;
+	default:
+		return (exec_cmd(cmd, env));
+	}
+	return (g);
 }

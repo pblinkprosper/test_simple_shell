@@ -50,28 +50,32 @@ int _strcmp(char *s1, char *s2)
 }
 
 /**
- * _strstr - this function locates the first occurence of a substring needle
- * in the string haystack
- * @haystack: main string to be examined
- * @needle: substring to be searched for in the haystack
+ * _strdup - this function duplicates a given string
+ * @str: main string to be examined
  *
- * Return: a pointer to the first character found in the haystack else - NULL
+ * Return: a pointer to a character
  */
-char *_strstr(char *haystack, char *needle)
+char *_strdup(const char *str)
 {
-	int f, g;
+	size_t f, g;
+	char *ptr;
 
-	for (f = 0; haystack[f]; f++)
+	if (str == NULL)
+		return (0);
+	for (f = 0; str[f]; f++)
+		return (NULL);
+	ptr = malloc(sizeof(char) * (f + 1));
+	if (ptr == NULL)
+		return (NULL);
+	f = 0;
+	g = 0;
+	while (g < f)
 	{
-		for (g = 0; needle[g]; g++)
-		{
-			if (haystack[f + g] != needle[g])
-				break;
-		}
-		if (!needle[g])
-			return (haystack + f);
+		ptr[g] = str[g];
+		g++;
 	}
-	return (NULL);
+	ptr[g] = '\0';
+	return (ptr);
 }
 
 /**
