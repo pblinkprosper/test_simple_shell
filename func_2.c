@@ -10,12 +10,13 @@ int _env(char **name)
 {
 	int e = 0;
 	int len = 0;
-	char *dup = malloc(2048);
+	char *dup = malloc(8192);
 
-	while (name[e])
+	while (name[e] != NULL)
 	{
 		len = _strlen(name[e]);
-		*dup = _strlen(name[e]);
+		dup = _strdup(name[e]);
+
 		write(STDOUT_FILENO, dup, len + 1);
 		write(1, "\n", 1);
 		free(dup);
@@ -38,7 +39,7 @@ char *_getenv(char **env, char *str)
 	int len = 0, m = 0, n = 0;
 	int i = 0;
 
-	while (*env != NULL)
+	while (*env)
 	{
 		path = _strdup(env[i]);
 		ptr = strtok(path, "=");
@@ -69,23 +70,24 @@ char *_getenv(char **env, char *str)
 
 /**
  * handle_path - this function gets the path for the command
- * @cmd: the command to search its path
+ * @args: the command to search its path
  * @env: the environment variable
  *
  * Return: an integer
  */
-int handle_path(char **cmd, char **env)
+int handle_path(char **args, char **env)
 {
 	pid_t pid, cpid;
-	char *delim = "/", *temp = NULL;
+	char *delim = "/";
+	char *temp = NULL;
 	int i = 0, j = 0;
 
-	temp = _strdup(cmd[0]);
-	if ((access(cmd[0], R_OK | X_OK)) == 0)
+	temp = _strdup(args[0]);
+	if ((access(args[0], R_OK | X_OK)) == 0)
 	{	pid = fork();
 		if (pid == 0)
 		{
-			i = execve(cmd[0], cmd, env);
+			i = execve(args[0], args, env);
 			if (i == -1)
 			{
 				perror("hsh");
@@ -102,16 +104,17 @@ int handle_path(char **cmd, char **env)
 		free(temp);
 		return (1);
 	}
-	else if (temp)
+	else if (temp != NULL)
 	{
-		for (j = 0; temp[j]; j++)
+		for (j = 0; temp[j] != '\0'; j++)
+		{
 			if (temp[j] == delim[0])
 			{
 				errno = ENOENT;
-				perror("hsh");
-				free(temp);
+				perror("hsh"), free(temp);
 				return (1);
 			}
+		}
 	}
 	free(temp);
 	return (0);
@@ -127,14 +130,15 @@ int handle_path(char **cmd, char **env)
 int get_f(char **cmd, char **env)
 {
 	int g = 0;
-	char *builtin[4] = {"env", "cd", "exit", NULL};
+	char *builtin[6] = {"exit", "cd", "env", "unsetenv", "setenv", NULL};
 
-	if (!cmd[0])
+	if (cmd[0] == NULL)
 		return (1);
-	for (; builtin[g] != NULL; g++)
+	while (builtin[g] != NULL)
 	{
 		if (_strcmp(builtin[g], cmd[0]) == 0)
 			break;
+		g++;
 	}
 	switch (g)
 	{
@@ -149,6 +153,12 @@ int get_f(char **cmd, char **env)
 		break;
 	case 2:
 		_env(env);
+		break;
+	case 3:
+		unset_env(env, cmd);
+		break;
+	case 4:
+		set_env(env, cmd);
 		break;
 	default:
 		return (exec_cmd(cmd, env));

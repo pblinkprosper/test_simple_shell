@@ -20,23 +20,49 @@ int _strlen(char *s)
 /**
  * _strcat - appends one string to another
  *
- * @dest: destination string
- * @src: source string
+ * @s1: destination string
+ * @s2: source string
  *
  * Return: appended string
  */
-char *_strcat(char *dest, char *src)
+char *_strcat(char *s1, char *s2)
 {
-	int i, len_dest, len_src;
+	int i, j, k;
+	int size;
+	char *temp;
 
-	len_dest = _strlen(dest);
-	len_src = _strlen(src);
+	i = 0;
+	j = 0;
+	k = 0;
 
-	for (i = 0; i <= len_src; i++)
+	if (s1 == NULL)
+		s1 = "";
+	if (s2 == NULL)
+		s2 = "";
+
+	while (s1[i] != '\0')
+		i++;
+	while (s2[j] != '\0')
+		j++;
+
+	size = i + j + 1;
+	temp = malloc(size * sizeof(char));
+	if (temp == NULL)
+		return (NULL);
+	j = 0;
+	while (k < size)
 	{
-		dest[len_dest + i] = src[i];
+		if (k < i)
+			temp[k] = s1[k];
+		else
+		{
+			temp[k] = s2[j];
+			j++;
+		}
+		k++;
 	}
-	return (dest);
+	temp[k - 1] = '\0';
+	return (temp);
 }
 /**
  * _memcpy - copies memory area

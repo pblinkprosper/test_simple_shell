@@ -18,7 +18,9 @@ int exit_message(char **arg)
 		return (0);
 	}
 	else
+	{
 		exit(message);
+	}
 }
 
 /**
@@ -37,6 +39,7 @@ int _cd(char **arg)
 	{
 		if (_strcmp(arg[1], "~"))
 			dir = home;
+
 		else if (_strcmp(arg[1], "-"))
 			dir = _getenv(environ, "OLDPWD");
 		else
@@ -44,6 +47,7 @@ int _cd(char **arg)
 	}
 	else
 		dir = home;
+
 	if (dir == home)
 		chdir(dir);
 	else if (access(dir, F_OK | R_OK) == 0)

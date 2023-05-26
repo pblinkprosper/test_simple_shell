@@ -2,7 +2,7 @@
 
 /**
  * check_cmd - this function checks the command entered
- * @str: the string
+ * @args: the string
  * @env: the environment
  * @nstr: the new string
  * @path: the path where the command exists
@@ -10,9 +10,9 @@
  *
  * Return: an integer
  */
-int check_cmd(char **str, char **env, char *nstr, char *path, char *npath)
+int check_cmd(char **args, char **env, char *nstr, char *path, char *npath)
 {
-	if ((handle_path(str, env)) == 1)
+	if ((handle_path(args, env)) == 1)
 		return (1);
 	if (nstr == NULL || path == NULL || npath == NULL)
 		exit_sh(NULL);
@@ -33,32 +33,33 @@ char **parse_cmd(char *cmd)
 	char *input = NULL;
 
 	tokens = malloc(sizeof(char *) * buff);
-	if (tokens == NULL)
+	if (!tokens)
 	{
 		perror("hsh");
 		exit(EXIT_FAILURE);
 	}
 	input = strtok(cmd, DELIM);
 
-	while (input)
+	while (input != NULL)
 	{
 		tokens[i] = input;
 		input = strtok(NULL, DELIM);
 		i++;
 	}
-		if (i >= buff)
+	if (i >= buff)
+	{
+		buff += BUFFER;
+		tokens = _realloc(tokens, BUFFER, buff * sizeof(char *));
+
+		if (!tokens)
 		{
-			buff += BUFFER;
-			tokens = _realloc(tokens, BUFFER, buff * sizeof(char *));
-			if (tokens == NULL)
 			{
-				{
-					perror("hsh: allocation error\n");
-					exit(EXIT_FAILURE);
-				}
+				perror("hsh: allocation error\n");
+				exit(EXIT_FAILURE);
 			}
-			input = strtok(NULL, DELIM);
 		}
+		input = strtok(NULL, DELIM);
+	}
 	tokens[i] = NULL;
 	return (tokens);
 }

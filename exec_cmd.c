@@ -11,28 +11,28 @@ int exec_cmd(char **args, char **env)
 {
 	pid_t pid, cpid;
 	int i = 0;
-	char *str = malloc(8 * BUFFER), *path = malloc(8 * BUFFER);
-	char *nstr = malloc(sizeof(char) * BUFFER), *npath = NULL;
+	char *nstr = malloc(8 * BUFFER);
+	char *path = malloc(8 * BUFFER);
+	char *nstr2 = malloc(sizeof(char) * BUFFER), *npath = NULL;
 
-	if (check_cmd(args, env, str, path, nstr))
+	if (check_cmd(args, env, nstr, path, nstr2))
 		return (1);
-	nstr = _getenv(env, "PATH");
+	nstr2 = _getenv(env, "PATH");
 	npath = _strcat("/", args[0]);
 	pid = fork();
 	if (pid == 0)
-	{
-		path = strtok(nstr, ":");
-		while (path != NULL)
+	{	path = strtok(nstr2, ":");
+		while (path)
 		{
-			str = _strcat(path, npath);
-			if ((access(str, X_OK)) == 0)
+			nstr = _strcat(path, npath);
+			if ((access(nstr, X_OK)) == 0)
 			{
 				free(npath);
-				i = execve(str, args, env);
+				i = execve(nstr, args, env);
 				if (i == -1)
 					perror("hsh");
 			}
-			free(str);
+			free(nstr);
 			path = strtok(NULL, ":");
 		}
 		write(STDERR_FILENO, "hsh", _strlen("hsh") + 1);
@@ -47,6 +47,6 @@ int exec_cmd(char **args, char **env)
 			if (cpid == -1)
 				perror("hsh");
 		} while (!WIFSIGNALED(i) && !WIFEXITED(i));
-	free(npath), free(str), free(path), free(nstr);
+	free(npath), free(nstr), free(path), free(nstr2);
 	return (1);
 }

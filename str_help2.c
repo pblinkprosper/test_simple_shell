@@ -60,15 +60,15 @@ char *_strdup(const char *str)
 	size_t f, g;
 	char *ptr;
 
+	f = 0;
+	g = 0;
 	if (str == NULL)
 		return (0);
-	for (f = 0; str[f]; f++)
-		return (NULL);
+	while (str[f] != '\0')
+		f++;
 	ptr = malloc(sizeof(char) * (f + 1));
 	if (ptr == NULL)
 		return (NULL);
-	f = 0;
-	g = 0;
 	while (g < f)
 	{
 		ptr[g] = str[g];
