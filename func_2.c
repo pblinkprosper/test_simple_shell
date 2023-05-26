@@ -103,8 +103,7 @@ int handle_path(char **args, char **env)
 			} while (!WIFSIGNALED(i) && !WIFEXITED(i));
 		free(temp);
 		return (1);
-	}
-	else if (temp != NULL)
+	}	else if (temp != NULL)
 	{
 		for (j = 0; temp[j] != '\0'; j++)
 		{
