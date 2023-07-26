@@ -127,70 +127,72 @@ void _memcpy(void *newptr, const void *ptr, unsigned int size);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 char **_realloc2(char **ptr, unsigned int old_size, unsigned int new_size);
 
-/* check_syntax_error.c */
+/* syntax_check.c */
 int repeated_char(char *input, int i);
 int error_sep_op(char *input, int i, char last);
 int first_char(char *input, int *i);
 void print_syntax_error(data_shell *datash, char *input, int i, int bool);
 int check_syntax_error(data_shell *datash, char *input);
 
-/* shell_loop.c */
+/* shell_init.c */
 char *without_comment(char *in);
 void shell_loop(data_shell *datash);
 
 /* read_line.c */
 char *read_line(int *i_eof);
 
-/* split.c */
+/* tokenize.c */
 char *swap_char(char *input, int bool);
 void add_nodes(sep_list **head_s, line_list **head_l, char *input);
 void go_next(sep_list **list_s, line_list **list_l, data_shell *datash);
 int split_commands(data_shell *datash, char *input);
 char **split_line(char *input);
 
-/* rep_var.c */
+/* variables_check.c */
 void check_env(r_var **h, char *in, data_shell *data);
 int check_vars(r_var **h, char *in, char *st, data_shell *data);
 char *replaced_input(r_var **head, char *input, char *new_input, int nlen);
 char *rep_var(char *input, data_shell *datash);
 
+/* shell.c */
+void free_data(data_shell *datash);
+void set_data(data_shell *datash, char **av);
+void get_sigint(int sig);
+
 /* get_line.c */
 void bring_line(char **lineptr, size_t *n, char *buffer, size_t j);
 ssize_t get_line(char **lineptr, size_t *n, FILE *stream);
 
-/* exec_line */
+/* builtin_cmd.c */
 int exec_line(data_shell *datash);
+int (*get_builtin(char *cmd))(data_shell *datash);
 
-/* cmd_exec.c */
+/* exec_cmd.c */
 int is_cdir(char *path, int *i);
 char *_which(char *cmd, char **_environ);
 int is_executable(data_shell *datash);
 int check_error_cmd(char *dir, data_shell *datash);
 int cmd_exec(data_shell *datash);
 
-/* env1.c */
+/* env_cmd.c */
+int cmp_env_name(const char *nenv, const char *name);
 char *_getenv(const char *name, char **_environ);
 int _env(data_shell *datash);
 
-/* env2.c */
+/* env_cmd2.c */
 char *copy_info(char *name, char *value);
 void set_env(char *name, char *value, data_shell *datash);
 int _setenv(data_shell *datash);
 int _unsetenv(data_shell *datash);
 
-/* cd.c */
+/* dir_change.c */
 void cd_dot(data_shell *datash);
 void cd_to(data_shell *datash);
 void cd_previous(data_shell *datash);
 void cd_to_home(data_shell *datash);
-
-/* cd_shell.c */
 int cd_shell(data_shell *datash);
 
-/* get_builtin */
-int (*get_builtin(char *cmd))(data_shell *datash);
-
-/* _exit.c */
+/* exit_cmd.c */
 int exit_shell(data_shell *datash);
 
 /* error_handle.c */
@@ -203,12 +205,7 @@ char *exit_sherr(data_shell *datash);
 char *env_error(data_shell *datash);
 char *path_error(data_shell *datash);
 
-
-char *error_permission(char **args);
-char *error_syntax(char **args);
-char *error_get_alias(char **args);
-
-/* get_error.c */
+/* check_error.c */
 int get_error(data_shell *datash, int eval);
 
 /* get_sigint.c */
@@ -226,7 +223,7 @@ void help_info(void);
 void alias_help(void);
 void cd_help(void);
 
-/* get_help.c */
+/* check_help.c */
 int get_help(data_shell *datash);
 
 #endif
