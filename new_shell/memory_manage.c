@@ -58,7 +58,7 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 }
 
 /**
- * _reallocdp - reallocates a memory block of a double pointer.
+ * _realloc2 - reallocates a memory block of a double pointer.
  * @ptr: double pointer to the memory previously allocated.
  * @old_size: size, in bytes, of the allocated space of ptr.
  * @new_size: new size, in bytes, of the new memory block.
@@ -67,7 +67,7 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
  * if new_size == old_size, returns ptr without changes.
  * if malloc fails, returns NULL.
  */
-char **_reallocdp(char **ptr, unsigned int old_size, unsigned int new_size)
+char **_realloc2(char **ptr, unsigned int old_size, unsigned int new_size)
 {
 	char **newptr;
 	unsigned int i;

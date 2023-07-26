@@ -129,12 +129,12 @@ void cd_previous(data_shell *datash)
 }
 
 /**
- * cd_to_home - changes to home directory
+ * cd_home - changes to home directory
  *
  * @datash: data relevant (environ)
  * Return: no return
  */
-void cd_to_home(data_shell *datash)
+void cd_home(data_shell *datash)
 {
 	char *p_pwd, *home;
 	char pwd[PATH_MAX];

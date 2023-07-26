@@ -21,7 +21,7 @@ int cd_shell(data_shell *datash)
 
 	if (dir == NULL || !ishome || !ishome2 || !isddash)
 	{
-		cd_to_home(datash);
+		cd_home(datash);
 		return (1);
 	}
 

@@ -2,13 +2,13 @@
 #define SHELL_H
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <errno.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <signal.h>
 #include <limits.h>
 
@@ -40,6 +40,17 @@ typedef struct data
 	char **_environ;
 	char *pid;
 } data_shell;
+
+/**
+ * struct builtin_s - Builtin struct for command args.
+ * @name: The name of the command builtin i.e cd, exit, env
+ * @f: data type pointer function.
+ */
+typedef struct builtin_s
+{
+	char *name;
+	int (*f)(data_shell *datash);
+} builtin_t;
 
 /**
  * struct sep_list_s - single linked list
@@ -81,48 +92,40 @@ typedef struct r_var_list
 	struct r_var_list *next;
 } r_var;
 
-/**
- * struct builtin_s - Builtin struct for command args.
- * @name: The name of the command builtin i.e cd, exit, env
- * @f: data type pointer function.
- */
-typedef struct builtin_s
-{
-	char *name;
-	int (*f)(data_shell *datash);
-} builtin_t;
-
-/* aux_lists.c */
-sep_list *add_sep_node_end(sep_list **head, char sep);
+/* mod_struct.c */
+sep_list *separ_end(sep_list **head, char sep);
 void free_sep_list(sep_list **head);
-line_list *add_line_node_end(line_list **head, char *line);
+line_list *add_node_end(line_list **head, char *line);
 void free_line_list(line_list **head);
 
-/* aux_lists2.c */
-r_var *add_rvar_node(r_var **head, int lvar, char *var, int lval);
+/* mod_struct2.c */
+r_var *rvar_end(r_var **head, int lvar, char *var, int lval);
 void free_rvar_list(r_var **head);
 
-/* aux_str functions */
+/* str_helpers.c */
 char *_strcat(char *dest, const char *src);
 char *_strcpy(char *dest, char *src);
 int _strcmp(char *s1, char *s2);
 char *_strchr(char *s, char c);
 int _strspn(char *s, char *accept);
 
-/* aux_mem.c */
-void _memcpy(void *newptr, const void *ptr, unsigned int size);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-char **_reallocdp(char **ptr, unsigned int old_size, unsigned int new_size);
-
-/* aux_str2.c */
+/* str_helpers2.c */
 char *_strdup(const char *s);
 int _strlen(const char *s);
 int cmp_chars(char str[], const char *delim);
 char *_strtok(char str[], const char *delim);
 int _isdigit(const char *s);
 
-/* aux_str3.c */
+/* str_helpers3.c */
+int get_len(int n);
+char *int_2str(int n);
+int _atoi(char *s);
 void rev_string(char *s);
+
+/* memory_manage.c */
+void _memcpy(void *newptr, const void *ptr, unsigned int size);
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+char **_realloc2(char **ptr, unsigned int old_size, unsigned int new_size);
 
 /* check_syntax_error.c */
 int repeated_char(char *input, int i);
@@ -190,24 +193,20 @@ int (*get_builtin(char *cmd))(data_shell *datash);
 /* _exit.c */
 int exit_shell(data_shell *datash);
 
-/* aux_stdlib.c */
-int get_len(int n);
-char *aux_itoa(int n);
-int _atoi(char *s);
+/* error_handle.c */
+char *concat_cderr(data_shell *, char *, char *, char *);
+char *get_cderr(data_shell *datash);
+char *error_msg(data_shell *datash);
+char *exit_sherr(data_shell *datash);
 
-/* aux_error1.c */
-char *strcat_cd(data_shell *, char *, char *, char *);
-char *error_get_cd(data_shell *datash);
-char *error_not_found(data_shell *datash);
-char *error_exit_shell(data_shell *datash);
+/* error_handle2.c */
+char *env_error(data_shell *datash);
+char *path_error(data_shell *datash);
 
-/* aux_error2.c */
-char *error_get_alias(char **args);
-char *error_env(data_shell *datash);
-char *error_syntax(char **args);
+
 char *error_permission(char **args);
-char *error_path_126(data_shell *datash);
-
+char *error_syntax(char **args);
+char *error_get_alias(char **args);
 
 /* get_error.c */
 int get_error(data_shell *datash, int eval);
@@ -215,17 +214,17 @@ int get_error(data_shell *datash, int eval);
 /* get_sigint.c */
 void get_sigint(int sig);
 
-/* aux_help.c */
-void aux_help_env(void);
-void aux_help_setenv(void);
-void aux_help_unsetenv(void);
-void aux_help_general(void);
-void aux_help_exit(void);
+/* cmd_info.c */
+void help_builtins(void);
+void env_help(void);
+void setenv_help(void);
+void unsetenv_help(void);
+void exit_help(void);
 
-/* aux_help2.c */
-void aux_help(void);
-void aux_help_alias(void);
-void aux_help_cd(void);
+/* cmd_info2.c */
+void help_info(void);
+void alias_help(void);
+void cd_help(void);
 
 /* get_help.c */
 int get_help(data_shell *datash);
